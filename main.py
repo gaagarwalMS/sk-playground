@@ -38,7 +38,6 @@ async def main():
         execution_settings = AzureChatPromptExecutionSettings()  
         execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})  
   
-        # Initialize a list to store the chat history manually  
         chatHistory = ChatHistory()
   
         # Initiate a back-and-forth chat  
@@ -55,7 +54,7 @@ async def main():
                     print("Please enter a prompt.")  
                     continue  
   
-                # Add user input to the manual history  
+                # Add user input to the chat history  
                 chatHistory.add_user_message(userInput)
   
                 # Get the response from the AI  
