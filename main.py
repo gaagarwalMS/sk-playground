@@ -1,9 +1,6 @@
 import os  
 import asyncio
-import traceback
-from openai import AzureOpenAI  
 from dotenv import load_dotenv  
-from typing import Annotated  
 from semantic_kernel import Kernel  
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion  
 from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase  
