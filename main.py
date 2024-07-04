@@ -33,9 +33,10 @@ async def main():
   
         # Enable planning  
         execution_settings = AzureChatPromptExecutionSettings()  
-        execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})  
   
-        chatHistory = ChatHistory()
+        chatHistory = ChatHistory(system_message="""
+            You are a friendly assitant who is built to help me with my software development tasks.
+            """)
   
         # Initiate a back-and-forth chat  
         while True:  
