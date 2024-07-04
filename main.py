@@ -39,7 +39,7 @@ async def main():
         execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})  
   
         # Initialize a list to store the chat history manually  
-        chat_history = []
+        chatHistory = ChatHistory()
   
         # Initiate a back-and-forth chat  
         while True:  
@@ -56,19 +56,11 @@ async def main():
                     continue  
   
                 # Add user input to the manual history  
-                chat_history.append({"role": "user", "content": userInput})
-
-                # Create a ChatHistory object  
-                semantic_chat_history = ChatHistory()  
-                for message in chat_history:  
-                    if message["role"] == "user":  
-                        semantic_chat_history.add_user_message(message["content"])  
-                    elif message["role"] == "agent":  
-                        semantic_chat_history.add_assistant_message(message["content"])  
+                chatHistory.add_user_message(userInput)
   
                 # Get the response from the AI  
                 result = (await chat_completion.get_chat_message_contents(  
-                    chat_history=semantic_chat_history,  
+                    chat_history=chatHistory,  
                     settings=execution_settings,  
                     kernel=kernel,  
                     arguments=KernelArguments(),  
@@ -78,7 +70,7 @@ async def main():
                 print("Assistant > " + str(result))  
   
                 # Add the message from the agent to the chat history  
-                chat_history.append({"role": "agent", "content": userInput})
+                chatHistory.add_assistant_message(str(result))
   
             except Exception as inner_ex:  
                 print(f"An error occurred during the chat loop: {inner_ex}")  
