@@ -9,7 +9,8 @@ from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.contents import ChatHistory  
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (  
     AzureChatPromptExecutionSettings,  
-)  
+)
+from utils.sendemail import EmailPlugin;
   
 async def main():  
     try:  
@@ -27,15 +28,24 @@ async def main():
             deployment_name=azure_oai_deployment,  
             api_key=azure_oai_key,  
             base_url=azure_oai_baseuri  
-        ))  
+        ))
+
+        kernel.add_plugin(
+        EmailPlugin(),
+        plugin_name="Email",
+    )  
   
         chat_completion: AzureChatCompletion = kernel.get_service(type=ChatCompletionClientBase)  
   
         # Enable planning  
-        execution_settings = AzureChatPromptExecutionSettings()  
+        execution_settings = AzureChatPromptExecutionSettings(tool_choice="auto")
+        execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})  
   
         chatHistory = ChatHistory(system_message="""
-            You are a friendly assitant who is built to help me with my software development tasks.
+                You are a friendly assistant who likes to follow the rules. You will complete required steps
+                and request approval before taking any consequential actions. If the user doesn't provide
+                enough information for you to complete a task, you will keep asking questions until you have
+                enough information to complete the task.
             """)
   
         # Initiate a back-and-forth chat  
