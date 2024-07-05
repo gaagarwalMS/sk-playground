@@ -1,5 +1,7 @@
 import os  
 import asyncio
+import logging 
+
 from dotenv import load_dotenv  
 from semantic_kernel import Kernel  
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion  
@@ -11,6 +13,7 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
     AzureChatPromptExecutionSettings,  
 )
 from utils.sendemail import EmailPlugin;
+from utils.bingsearch import SearchInternet;
   
 async def main():  
     try:  
@@ -18,7 +21,9 @@ async def main():
         load_dotenv()  
         azure_oai_key = os.getenv("AZURE_OAI_KEY")  
         azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")  
-        azure_oai_baseuri = os.getenv("AZURE_OAI_ENDPOINT")  
+        azure_oai_baseuri = os.getenv("AZURE_OAI_ENDPOINT")
+        search_endpoint = os.getenv("SEARCH_ENDPOINT")
+        subscription_key = os.getenv("SUBSCRIPTION_KEY")  
   
         if not all([azure_oai_key, azure_oai_deployment, azure_oai_baseuri]):  
             raise ValueError("Azure OpenAI configuration is not set correctly in .env file")  
@@ -30,10 +35,21 @@ async def main():
             base_url=azure_oai_baseuri  
         ))
 
+        # Set the logging level for  semantic_kernel.kernel to DEBUG.
+        logging.basicConfig(
+            format="[%(asctime)s - %(name)s:%(lineno)d - %(levelname)s] %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        logging.getLogger("kernel").setLevel(logging.DEBUG)
+
         kernel.add_plugin(
-        EmailPlugin(),
-        plugin_name="Email",
-    )  
+            EmailPlugin(),
+            plugin_name="Email"
+        )
+        kernel.add_plugin(
+            SearchInternet(),
+            plugin_name="SearchInternet"
+        )  
   
         chat_completion: AzureChatCompletion = kernel.get_service(type=ChatCompletionClientBase)  
   
