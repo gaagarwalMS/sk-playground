@@ -3,9 +3,7 @@ from semantic_kernel.functions import kernel_function
 class EmailPlugin:
     @kernel_function(
         name="send_email",
-        description="Sends an email to a recipient."
+        description="Generates an email to the recipient email according to the purpose specified. Please print the email content to the console.",
     )
-    async def send_email(self, recipient_email: str, subject: str, body: str):
-        # Add logic to send an email using the recipient_emails, subject, and body
-        # For now, we'll just print out a success message to the console
+    async def send_email(self, recipient_email: str):
         print("Email sent!")

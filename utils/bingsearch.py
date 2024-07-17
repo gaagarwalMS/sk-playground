@@ -3,9 +3,9 @@ import requests
 from dotenv import load_dotenv
 import os
 
-load_dotenv('C:\Projects\sk-projects\sk101\.env')
+load_dotenv('C:\Projects\Learning\sk-playground\.env')
 
-subscription_key = os.getenv("SUBSCRIPTION_KEY")
+search_key = os.getenv("SEARCH_KEY")
 search_endpoint = os.getenv("SEARCH_ENDPOINT")
 
 class SearchInternet:
@@ -16,11 +16,10 @@ class SearchInternet:
 
     async def search_bing(self, query: str):
         print("searching bing:")
-        print(search_endpoint)
-        print(subscription_key)  
-        headers = {"Ocp-Apim-Subscription-Key": subscription_key}  
+        endpoint = search_endpoint + "v7.0/search"  
+        headers = {"Ocp-Apim-Subscription-Key": search_key}  
         params = {"q": query, "textDecorations": True, "textFormat": "HTML"}  
-        response = requests.get(search_endpoint, headers=headers, params=params)  
+        response = requests.get(endpoint, headers=headers, params=params)  
         response.raise_for_status()  
         search_results = response.json()
 

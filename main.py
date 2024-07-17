@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from semantic_kernel import Kernel  
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion  
 from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase  
-from semantic_kernel.connectors.ai.function_call_behavior import FunctionCallBehavior  
+from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior  
 from semantic_kernel.functions.kernel_arguments import KernelArguments  
 from semantic_kernel.contents import ChatHistory  
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (  
@@ -19,20 +19,20 @@ async def main():
     try:  
         # Get configuration settings  
         load_dotenv()  
+        azure_oai_endpoint = os.getenv("AZURE_OAI_ENDPOINT")  
         azure_oai_key = os.getenv("AZURE_OAI_KEY")  
-        azure_oai_deployment = os.getenv("AZURE_OAI_DEPLOYMENT")  
-        azure_oai_baseuri = os.getenv("AZURE_OAI_ENDPOINT")
-        search_endpoint = os.getenv("SEARCH_ENDPOINT")
-        subscription_key = os.getenv("SUBSCRIPTION_KEY")  
+        azure_oai_gpt4o_deployment = os.getenv("AZURE_OAI_GPT4O_DEPLOYMENT")
+        azure_chat_dep_baseurl = os.getenv("AZURE_CHAT_DEP_BASEURL")
   
-        if not all([azure_oai_key, azure_oai_deployment, azure_oai_baseuri]):  
+        if not all([azure_oai_key, azure_oai_endpoint, azure_oai_gpt4o_deployment]):  
             raise ValueError("Azure OpenAI configuration is not set correctly in .env file")  
   
         kernel = Kernel()  
         kernel.add_service(AzureChatCompletion(  
-            deployment_name=azure_oai_deployment,  
+            service_id="chat_completion", 
+            deployment_name=azure_oai_gpt4o_deployment,  
             api_key=azure_oai_key,  
-            base_url=azure_oai_baseuri  
+            base_url=azure_chat_dep_baseurl
         ))
 
         # Set the logging level for  semantic_kernel.kernel to DEBUG.
@@ -51,11 +51,13 @@ async def main():
             plugin_name="SearchInternet"
         )  
   
-        chat_completion: AzureChatCompletion = kernel.get_service(type=ChatCompletionClientBase)  
+        chat_completion: AzureChatCompletion = kernel.get_service("chat_completion")  
   
         # Enable planning  
         execution_settings = AzureChatPromptExecutionSettings(tool_choice="auto")
-        execution_settings.function_call_behavior = FunctionCallBehavior.EnableFunctions(auto_invoke=True, filters={})  
+        execution_settings.function_choice_behavior = FunctionChoiceBehavior(
+            function_choice="auto"
+        )
   
         chatHistory = ChatHistory(system_message="""
                 You are a friendly assistant who likes to follow the rules. You will complete required steps
